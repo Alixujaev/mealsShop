@@ -14,3 +14,4 @@ export const getMealsById = async(mealsid) => {
     const request = await fetch(API_URL + 'lookup.php?i=' + mealsid)
     return await request.json()
 }
+

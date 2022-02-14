@@ -1,17 +1,40 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Categories from "./components/Categories";
 import Products from "./components/Products";
 import Meals from "./components/Meals";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Purchases from "./components/Purchases";
+import Search from "./components/Search";
+import { getAllCategories } from "./api";
 
 
 function App() {
   const [order, setOrder] = useState([])
   const [active, setActive]= useState(false)
+  const [catalog, setCatalog] = useState([])
+  const [filtered, setfiltered] = useState([])
+  const {pathname, search} = useLocation()
+  const navigate = useNavigate()
+  console.log(navigate);
+  
+  const handleSearch = (str) => {
+    setfiltered(catalog.filter(item => item.strCategory.toLowerCase().includes(str.toLowerCase())))
+    navigate({
+      pathname,
+      search: `?s=${str}`
+    })
+  }
+
+  useEffect(() => {
+    getAllCategories().then(data => {
+      setCatalog(data.categories)
+      setfiltered( search ? 
+        data.categories.filter(item => item.strCategory.toLowerCase().includes(search.split('=')[1].toLowerCase())) : data.categories)
+    })
+  }, [search])
 
   const addToBasket = (item) => {
     const itemIndex = order.findIndex((i) => i.idMeal === item.idMeal)
@@ -82,6 +105,7 @@ function App() {
         <Route path={`/products/:id`} element={<Products setActive={setActive} addToBasket={addToBasket} />}/>
         <Route path={`/meals/:meals`} element={<Meals addToBasket={addToBasket}/>}/>
         <Route path={`/purchases`} element={<Purchases removeFromBasket={removeFromBasket} incrementQuantity={incrementQuantity} decrementQuantity={decrementQuantity} order={order}/>}/>
+        <Route path={`/search`} element={<Search cb={handleSearch} catalog={filtered}/>}/>
       </Routes>
       <Footer/>
     </div>

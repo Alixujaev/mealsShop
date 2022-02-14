@@ -23,6 +23,9 @@ const Navbar = ({active, setActive}) => {
              )
             }
             </li>
+            <li>
+              <NavLink activeClassName='active' to={`/search`} className='navbar_link'><i class="material-icons">search</i></NavLink>
+            </li>
         </div>
       </div>
     </div>
